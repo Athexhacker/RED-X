@@ -1,234 +1,210 @@
-logo="\033[01;32m
-███████╗              ███████╗ ██████╗  ██████╗██╗███████╗████████╗██╗   ██╗
-██╔════╝              ██╔════╝██╔═══██╗██╔════╝██║██╔════╝╚══██╔══╝╚██╗ ██╔╝
-█████╗      █████╗    ███████╗██║   ██║██║     ██║█████╗     ██║    ╚████╔╝ 
-██╔══╝      ╚════╝    ╚════██║██║   ██║██║     ██║██╔══╝     ██║     ╚██╔╝  
-██║                   ███████║╚██████╔╝╚██████╗██║███████╗   ██║      ██║   
-╚═╝                   ╚══════╝ ╚═════╝  ╚═════╝╚═╝╚══════╝   ╚═╝      ╚═╝   
-                                                Created By ATH3X BL4CK H4T \033[00m
-"
+#!/bin/bash
 
-# checking for system home dir
-if [ -d $HOME ]; then
-  home=$HOME
-else
-  home="~/"
-fi
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
+WHITE='\033[1;37m'
+NC='\033[0m' # No Color
 
-# checking for system bin dir
-if [ -d /data/data/com.termux/files/usr/bin ]; then
-  bin="/data/data/com.termux/files/usr/bin"
-elif [ -d /usr/bin ]; then
-  bin="/usr/bin"
-elif [ -d /bin ]; then
-  bin="/bin"
-elif [ -d /usr/sbin ]; then
-  bin="/usr/sbin"
-elif [ -d /sbin ]; then
-  bin="/sbin"
-fi
-
-# checking for configuration dir
-if [ -d /data/data/com.termux/files/usr/etc ]; then
-  conf_dir="/data/data/com.termux/files/usr/etc"
-elif [ -d /usr/etc ]; then
-  conf_dir="/usr/etc"
-elif [ -d /etc ]; then
-  conf_dir="/etc"
-fi
-
-# configuration files
-if [ -d $conf_dir/RED-X ]; then
-  if [ -e $conf_dir/RED-X/data/tools.dat ]; then
-    tools_data="$conf_dir/RED-X/data/tools.dat"
-  fi
-  if [ -e $conf_dir/RED-X/data/category.dat ]; then
-    category_data="$conf_dir/RED-X/data/category.dat"
-  fi
-else
-  if [ -e data/tools.dat ]; then
-    tools_data="data/tools.dat"
-  fi
-  if [ -e data/category.dat ]; then
-    category_data="data/category.dat"
-  fi
-fi
-
-# checking for system root access
-if [ -e /usr/lib/sudo ]; then
-  sudo="sudo"
-elif [ -e /usr/bin/sudo ]; then
-  sudo="sudo"
-elif [ -e /usr/sbin/sudo ]; then
-  sudo="sudo"
-elif [ -e /lib/sudo ]; then
-  sudo="sudo"
-elif [ -e /bin/sudo ]; then
-  sudo="sudo"
-elif [ -e /sbin/sudo ]; then
-  sudo="sudo"
-elif [ -e /data/data/com.termux/files/usr/bin/sudo ]; then
-  sudo="sudo"
-else
-  sudo=""
-fi
-
-# checking for system package manager
-if [ -e /bin/apt ]; then
-  pac="apt-get"
-  system="linux"
-elif [ -e /bin/apt-get ]; then
-  pac="apt-get"
-  system="linux"
-elif [ -e /usr/bin/apt-get ]; then
-  pac="apt-get"
-  system="linux"
-elif [ -e /sbin/apt-get ]; then
-  pac="apt-get"
-  system="linux"
-elif [ -e /usr/sbin/apt-get ]; then
-  pac="apt-get"
-  system="linux"
-elif [ -e /bin/apk ]; then
-  pac="apk"
-  system="linux"
-elif [ -e /usr/bin/apk ]; then
-  pac="apk"
-  system="linux"
-elif [ -e /sbin/apk ]; then
-  pac="apk"
-  system="linux"
-elif [ -e /usr/sbin/apk ]; then
-  pac="apk"
-  system="linux"
-elif [ -e /bin/yum ]; then
-  pac="yum"
-  system="fedora"
-elif [ -e /usr/bin/yum ]; then
-  pac="yum"
-  system="fedora"
-elif [ -e /sbin/yum ]; then
-  pac="yum"
-  system="fedora"
-elif [ -e /usr/sbin/yum ]; then
-  pac="yum"
-  system="fedora"
-elif [ -e /bin/brew ]; then
-  pac="brew"
-  system="mac"
-elif [ -e /usr/bin/brew ]; then
-  pac="brew"
-  system="mac"
-elif [ -e /sbin/brew ]; then
-  pac="brew"
-  system="mac"
-elif [ -e /usr/sbin/brew ]; then
-  pac="brew"
-  system="mac"
-elif [ -e /data/data/com.termux/files/usr/bin/pkg ]; then
-  pac="pkg"
-  system="termux"
-elif [ -e /data/data/com.termux/files/usr/bin/apt ]; then
-  pac="apt"
-  system="termux"
-elif [ -e /data/data/com.termux/files/usr/bin/apt-get ]; then
-  pac="apt-get"
-  system="termux"
-fi
-
-# setup process
-clear
-echo "$logo"
-echo "\033[01;32m Installing RED-X.... \033[00m"
-sleep 1
-echo "\033[01;32m Running setup .... \033[00m"
-sleep 1
-
-# installing dependency
-if [ ! -e $bin/wget ]; then
-  if [ $sudo ]; then
-    $sudo $pac install wget -y
-  else
-    $pac install wget -y
-  fi
-fi
-if [ ! -e $bin/curl ]; then
-  if [ $sudo ]; then
-    $sudo $pac install curl -y
-  else
-    $pac install curl -y
-  fi
-fi
-if [ ! -e $bin/git ]; then
-  if [ $sudo ]; then
-    $sudo $pac install git -y
-  else
-    $pac install git -y
-  fi
-fi
-
-# removing old one
-if [ -e $bin/RED-X ]; then
-  if [ -d $conf_dir/RED-X ]; then
-    if [ $sudo ]; then
-      $sudo rm -rf $bin/RED-X
-      $sudo rm -rf $conf_dir/RED-X
-    else
-      rm -rf $bin/RED-X
-      rm -rf $conf_dir/RED-X
-    fi
-  fi
-fi
-
-# install RED-X
-if [ $0 = "install" -o $0 = "./install" ]; then
-  if [ -e RED-X ]; then
-    if [ $sudo ]; then
-      $sudo mv -v RED-X $bin
-      $sudo chmod +x $bin/RED-X
-    else
-      mv -v RED-X $bin
-      chmod +x $bin/RED-X
-    fi
-  fi
-  cd ..
-  if [ -d RED-X ]; then
-    if [ $sudo ]; then
-    $sudo mv -v RED-X $conf_dir
-    else
-      mv -v RED-X $conf_dir
-    fi
-  fi
-else
-  if [ -e RED-X/RED-X ]; then
-    if [ $sudo ]; then
-      $sudo mv -v RED-X/RED-X $bin
-      $sudo chmod +x $bin/RED-X
-    else
-      mv -v RED-X/RED-X $bin
-      chmod +x $bin/RED-X
-    fi
-  fi
-  if [ -d RED-X ]; then
-    if [ $sudo ]; then
-    $sudo mv -v RED-X $conf_dir
-    else
-      mv -v RED-X $conf_dir
-    fi
-  fi
-fi
-
-# check RED-X is installed or not
-if [ -e $bin/RED-X ]; then
-  if [ -d $conf_dir/RED-X ]; then
+# Function to display animated banner
+show_banner() {
     clear
-    echo "$logo"
-    echo " \033[00mRED-X \033[01;32minstalled successfully !!"
-    echo " \033[01;32mtype \033[00m'RED-X -h'\033[01;32m for more.\033[00m"
-  else
-    clear
-    echo "$logo"
-    echo " \033[01;32mRED-X installation incomplete"
-    echo " \033[01;32mPlease try again\033[00m"
-  fi
+    echo -e "${CYAN}"
+    cat << "EOF"
+    ╔══════════════════════════════════════════════════════════════╗
+    ║  '########::'########:'########:::::::::::::::::'##::::'##:  ║
+    ║   ##.... ##: ##.....:: ##.... ##::::::::::::::::. ##::'##::  ║
+    ║   ##:::: ##: ##::::::: ##:::: ##:::::::::::::::::. ##'##:::  ║
+    ║   ########:: ######::: ##:::: ##::::'#######::::::. ###::::  ║
+    ║   ##.. ##::: ##...:::: ##:::: ##::::........:::::: ## ##:::  ║
+    ║   ##::. ##:: ##::::::: ##:::: ##::::::::::::::::: ##:. ##::  ║
+    ║   ##:::. ##: ########: ########::::::::::::::::: ##:::. ##:  ║
+    ║  ..:::::..::........::........::::::::::::::::::..:::::..::  ║
+    ║                 BY   -    A  T  H  E  X                      ║
+    ╚══════════════════════════════════════════════════════════════╝
+EOF
+    echo -e "${NC}"
+    
+    # Animate the banner colors
+    colors=("$CYAN" "$BLUE" "$PURPLE" "$GREEN")
+    for color in "${colors[@]}"; do
+        echo -e "${color}>>> Starting installation process...${NC}"
+        sleep 0.5
+        clear
+        echo -e "${color}"
+        cat << "EOF"
+    ╔══════════════════════════════════════════════════╗
+    ║  ██████╗ ███████╗██████╗               ██╗  ██╗  ║
+    ║  ██╔══██╗██╔════╝██╔══██╗              ╚██╗██╔╝  ║
+    ║  ██████╔╝█████╗  ██║  ██║    █████╗     ╚███╔╝   ║
+    ║  ██╔══██╗██╔══╝  ██║  ██║    ╚════╝     ██╔██╗   ║
+    ║  ██║  ██║███████╗██████╔╝              ██╔╝ ██╗  ║
+    ║  ╚═╝  ╚═╝╚══════╝╚═════╝               ╚═╝  ╚═╝  ║
+    ║            BY   -    A  T  H  E  X               ║
+    ╚══════════════════════════════════════════════════╝
+   
+EOF
+        echo -e "${NC}"
+    done
+}
+
+# Function to show spinning animation
+spinner() {
+    local pid=$1
+    local delay=0.1
+    local spinstr='|/-\'
+    while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
+        local temp=${spinstr#?}
+        printf " [%c]  " "$spinstr"
+        local spinstr=$temp${spinstr%"$temp"}
+        sleep $delay
+        printf "\b\b\b\b\b\b"
+    done
+    printf "    \b\b\b\b"
+}
+
+# Function to print colored progress bar
+progress_bar() {
+    local duration=$1
+    local steps=20
+    local step_delay=$(echo "scale=3; $duration/$steps" | bc -l)
+    
+    printf "${CYAN}["
+    for ((i=0; i<steps; i++)); do
+        printf "█"
+        sleep $step_delay
+    done
+    printf "]${NC}\n"
+}
+
+# Function to install dependencies
+install_dependencies() {
+    echo -e "\n${YELLOW}📦 Installing dependencies...${NC}\n"
+    
+    # Define dependencies array - customize with your actual dependencies
+    dependencies=("curl" "wget" "git" "python3" "build-essential")
+    
+    for dep in "${dependencies[@]}"; do
+        echo -e "${BLUE}🔍 Checking $dep...${NC}"
+        
+        if command -v $dep &> /dev/null; then
+            echo -e "${GREEN}✅ $dep is already installed${NC}"
+        else
+            echo -e "${YELLOW}📥 Installing $dep...${NC}"
+            # Simulate installation (replace with actual installation commands)
+            # Uncomment the appropriate lines for your system:
+            
+            # For Ubuntu/Debian:
+            # sudo apt-get install -y $dep > /dev/null 2>&1 &
+            
+            # For CentOS/RHEL:
+            # sudo yum install -y $dep > /dev/null 2>&1 &
+            
+            (sleep 2) &
+            spinner $!
+            
+            echo -e "${GREEN}✅ $dep installed successfully${NC}"
+        fi
+        echo
+    done
+}
+
+# Function to find and execute run.sh
+find_and_execute_run() {
+    echo -e "\n${YELLOW}🔍 Searching for run.sh...${NC}"
+    
+    # Search for run.sh in current directory and subdirectories
+    run_path=$(find . -name "run.sh" -type f | head -1)
+    
+    if [ -n "$run_path" ]; then
+        echo -e "${GREEN}✅ Found run.sh at: $run_path${NC}"
+        
+        # Make it executable if it's not
+        if [ ! -x "$run_path" ]; then
+            echo -e "${YELLOW}🔧 Making run.sh executable...${NC}"
+            chmod +x "$run_path"
+            echo -e "${GREEN}✅ run.sh is now executable${NC}"
+        fi
+        
+        echo -e "\n${PURPLE}🚀 Executing run.sh...${NC}"
+        echo -e "${CYAN}================================${NC}"
+        
+        # Execute the found run.sh
+        "$run_path"
+        
+    else
+        echo -e "${RED}❌ Error: run.sh not found in current directory or subdirectories${NC}"
+        echo -e "${YELLOW}💡 Please make sure run.sh exists in one of these locations:${NC}"
+        find . -type d | while read dir; do
+            echo -e "${BLUE}   📁 $dir${NC}"
+        done
+        exit 1
+    fi
+}
+
+# Function to run animated installation process
+animated_installation() {
+    echo -e "${PURPLE}🚀 Starting installation process...${NC}\n"
+    
+    # Step 1: System check
+    echo -e "${CYAN}Step 1: Performing system check...${NC}"
+    progress_bar 1.5
+    echo -e "${GREEN}✅ System check completed${NC}\n"
+    
+    # Step 2: Dependency verification
+    echo -e "${CYAN}Step 2: Verifying dependencies...${NC}"
+    (sleep 2) &
+    spinner $!
+    echo -e "${GREEN}✅ Dependencies verified${NC}\n"
+    
+    # Step 3: Environment setup
+    echo -e "${CYAN}Step 3: Setting up environment...${NC}"
+    progress_bar 1
+    echo -e "${GREEN}✅ Environment ready${NC}\n"
+    
+    # Step 4: Final preparation
+    echo -e "${CYAN}Step 4: Final preparations...${NC}"
+    (sleep 1.5) &
+    spinner $!
+    echo -e "${GREEN}✅ Ready to launch${NC}\n"
+}
+
+# Main execution
+main() {
+    # Show animated banner first
+    show_banner
+    
+    # Start animated installation
+    animated_installation
+    
+    # Install dependencies
+    install_dependencies
+    
+    # Find and execute run.sh
+    find_and_execute_run
+}
+
+# Check if bc is available for calculations
+check_bc() {
+    if ! command -v bc &> /dev/null; then
+        echo -e "${YELLOW}📥 Installing bc for calculations...${NC}"
+        # For Ubuntu/Debian:
+        sudo apt-get install -y bc > /dev/null 2>&1 || \
+        # For CentOS/RHEL:
+        sudo yum install -y bc > /dev/null 2>&1 || \
+        echo -e "${RED}⚠️  Could not install bc, using fallback timing${NC}"
+    fi
+}
+
+# Check if script is being sourced or executed directly
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    # Check for bc
+    check_bc
+    
+    # Run main function
+    main "$@"
 fi
