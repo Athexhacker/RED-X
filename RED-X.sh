@@ -434,104 +434,6 @@ progress_bar() {
     printf "] Done!\n"
 }
 
-# Function to detect and run tool based on file extensions
-run_tool_automatically() {
-    local tool_dir="$1"
-    local display_name="$2"
-    
-    cd "$tool_dir"
-    
-    echo -e "${CYAN}Searching for executable files in $display_name...${NC}"
-    
-    # Look for common executable patterns
-    local found_executable=false
-    
-    # Check for Python files
-    if ls *.py >/dev/null 2>&1; then
-        local py_files=$(ls *.py | head -1)
-        echo -e "${GREEN}Found Python script: $py_files${NC}"
-        echo -e "${YELLOW}Running Python tool...${NC}"
-        python "$py_files" --help || python "$py_files" -h || echo -e "${BLUE}Tool executed successfully${NC}"
-        found_executable=true
-    fi
-    
-    # Check for shell scripts
-    if ls *.sh >/dev/null 2>&1; then
-        local sh_files=$(ls *.sh | head -1)
-        echo -e "${GREEN}Found shell script: $sh_files${NC}"
-        echo -e "${YELLOW}Running shell script...${NC}"
-        chmod +x "$sh_files"
-        ./"$sh_files" --help || ./"$sh_files" -h || echo -e "${BLUE}Tool executed successfully${NC}"
-        found_executable=true
-    fi
-    
-    # Check for Perl scripts
-    if ls *.pl >/dev/null 2>&1; then
-        local pl_files=$(ls *.pl | head -1)
-        echo -e "${GREEN}Found Perl script: $pl_files${NC}"
-        echo -e "${YELLOW}Running Perl tool...${NC}"
-        perl "$pl_files" --help || perl "$pl_files" -h || echo -e "${BLUE}Tool executed successfully${NC}"
-        found_executable=true
-    fi
-    
-    # Check for Ruby scripts
-    if ls *.rb >/dev/null 2>&1; then
-        local rb_files=$(ls *.rb | head -1)
-        echo -e "${GREEN}Found Ruby script: $rb_files${NC}"
-        echo -e "${YELLOW}Running Ruby tool...${NC}"
-        ruby "$rb_files" --help || ruby "$rb_files" -h || echo -e "${BLUE}Tool executed successfully${NC}"
-        found_executable=true
-    fi
-    
-    # Check for PHP scripts
-    if ls *.php >/dev/null 2>&1; then
-        local php_files=$(ls *.php | head -1)
-        echo -e "${GREEN}Found PHP script: $php_files${NC}"
-        echo -e "${YELLOW}Running PHP tool...${NC}"
-        php "$php_files" --help || php "$php_files" -h || echo -e "${BLUE}Tool executed successfully${NC}"
-        found_executable=true
-    fi
-    
-    # Check for binary executables
-    if find . -maxdepth 1 -type f -executable ! -name "*.py" ! -name "*.sh" ! -name "*.pl" ! -name "*.rb" ! -name "*.php" | grep -q .; then
-        local bin_files=$(find . -maxdepth 1 -type f -executable ! -name "*.py" ! -name "*.sh" ! -name "*.pl" ! -name "*.rb" ! -name "*.php" | head -1)
-        echo -e "${GREEN}Found binary executable: $(basename "$bin_files")${NC}"
-        echo -e "${YELLOW}Running binary tool...${NC}"
-        "$bin_files" --help || "$bin_files" -h || echo -e "${BLUE}Tool executed successfully${NC}"
-        found_executable=true
-    fi
-    
-    # Check for specific tool names
-    if [ -f "tool" ] && [ -x "tool" ]; then
-        echo -e "${GREEN}Found generic 'tool' executable${NC}"
-        echo -e "${YELLOW}Running tool...${NC}"
-        ./tool --help || ./tool -h || echo -e "${BLUE}Tool executed successfully${NC}"
-        found_executable=true
-    fi
-    
-    if [ -f "main" ] && [ -x "main" ]; then
-        echo -e "${GREEN}Found 'main' executable${NC}"
-        echo -e "${YELLOW}Running main...${NC}"
-        ./main --help || ./main -h || echo -e "${BLUE}Tool executed successfully${NC}"
-        found_executable=true
-    fi
-    
-    if [ -f "run" ] && [ -x "run" ]; then
-        echo -e "${GREEN}Found 'run' executable${NC}"
-        echo -e "${YELLOW}Running tool...${NC}"
-        ./run --help || ./run -h || echo -e "${BLUE}Tool executed successfully${NC}"
-        found_executable=true
-    fi
-    
-    if ! $found_executable; then
-        echo -e "${YELLOW}No obvious executable files found. Checking directory structure...${NC}"
-        ls -la
-        echo -e "${CYAN}Please check the README or documentation for how to run this tool.${NC}"
-    fi
-    
-    cd ~
-}
-
 # Utility functions
 check_dependencies() {
     local deps=$1
@@ -605,10 +507,6 @@ install_tool() {
                     make install 2>/dev/null &
                     spinner $!
                 fi
-                
-                # NEW: Automatically detect and run the tool after installation
-                echo -e "${PURPLE}Attempting to automatically run the tool...${NC}"
-                run_tool_automatically "$PWD" "$display_name"
             fi
             ;;
         "curl")
@@ -617,25 +515,12 @@ install_tool() {
                 curl -O "$url" 2>/dev/null &
                 spinner $!
                 chmod +x "${url##*/}" 2>/dev/null || true
-                
-                # NEW: Try to run the downloaded tool
-                local downloaded_file="${url##*/}"
-                if [[ -f "$downloaded_file" && -x "$downloaded_file" ]]; then
-                    echo -e "${PURPLE}Attempting to run downloaded tool...${NC}"
-                    ./"$downloaded_file" --help || ./"$downloaded_file" -h || echo -e "${BLUE}Tool downloaded successfully${NC}"
-                fi
             fi
             ;;
         "package_manager")
             echo -e "${GREEN}Installing via package manager...${NC}"
             pkg install -y "$tool_name" 2>/dev/null || apt install -y "$tool_name" 2>/dev/null || yum install -y "$tool_name" 2>/dev/null &
             spinner $!
-            
-            # NEW: Try to run the installed package
-            if command -v "$tool_name" &> /dev/null; then
-                echo -e "${PURPLE}Attempting to run installed package...${NC}"
-                "$tool_name" --help || "$tool_name" -h || echo -e "${BLUE}Package installed successfully${NC}"
-            fi
             ;;
     esac
 
@@ -677,7 +562,7 @@ show_tools() {
     done
 
     echo -e "\n${WHITE}Page $page of $total_pages${NC}"
-    echo -e "${CYAN}Commands: [n] next, [p] previous, [number] install, [s] search, [q] quit${NC}"
+    echo -e "${CYAN}Commands: [n] exit, [p] previous, [number] install, [s] search, [q] quit${NC}"
 }
 
 search_tools() {
@@ -784,7 +669,6 @@ show_banner() {
 �                                                                �
 �              A T H E X   T O O L K I T   v2.0                  �
 �                  370+ Security Tools                           �
-�                  Auto-Run Feature Enabled                      �
 �                                                                �
 +----------------------------------------------------------------+
 BANNER
